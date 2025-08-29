@@ -1,0 +1,114 @@
+Perfect 👍 I’ll put together a **single script** that:
+
+1. Installs build dependencies
+2. Builds and installs the latest **libplist** (>= 2.6.0, required by libtatsu)
+3. Builds and installs the latest **libtatsu**
+4. Refreshes linker + pkg-config paths
+
+This will work in a **Pixel full Linux environment**. If you’re inside **Termux/proot (no sudo)**, I’ll also give you a local-user version.
+
+---
+
+## 🔹 Script (system-wide install, with sudo)
+
+Save this as `build_libtatsu.sh` and run:
+
+```bash
+#!/bin/bash
+set -e
+
+# Install dependencies
+sudo apt update
+sudo apt install -y git build-essential autoconf automake libtool pkg-config checkinstall \
+                   libssl-dev libcurl4-openssl-dev
+
+# Build and install latest libplist
+if [ ! -d libplist ]; then
+  git clone https://github.com/libimobiledevice/libplist.git
+fi
+cd libplist
+./autogen.sh
+make
+sudo make install
+cd ..
+
+# Refresh linker
+sudo ldconfig
+
+# Build and install latest libtatsu
+if [ ! -d libtatsu ]; then
+  git clone https://github.com/libimobiledevice/libtatsu.git
+fi
+cd libtatsu
+./autogen.sh
+make
+sudo make install
+cd ..
+
+# Refresh linker again
+sudo ldconfig
+
+echo "✅ libplist and libtatsu installed successfully!"
+```
+
+Run it:
+
+```bash
+chmod +x build_libtatsu.sh
+./build_libtatsu.sh
+```
+
+---
+
+## 🔹 Script (local install, no sudo – for Termux/proot)
+
+If you don’t have `sudo`, use this version instead:
+
+```bash
+#!/bin/bash
+set -e
+
+PREFIX=$HOME/.local
+mkdir -p $PREFIX
+
+# Install dependencies via apt (where possible)
+apt update
+apt install -y git build-essential autoconf automake libtool pkg-config
+
+# Build and install latest libplist locally
+if [ ! -d libplist ]; then
+  git clone https://github.com/libimobiledevice/libplist.git
+fi
+cd libplist
+./autogen.sh --prefix=$PREFIX
+make
+make install
+cd ..
+
+# Build and install latest libtatsu locally
+if [ ! -d libtatsu ]; then
+  git clone https://github.com/libimobiledevice/libtatsu.git
+fi
+cd libtatsu
+./autogen.sh --prefix=$PREFIX
+make
+make install
+cd ..
+
+# Export paths for pkg-config & linker
+echo "export PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig:\$PKG_CONFIG_PATH" >> ~/.bashrc
+echo "export LD_LIBRARY_PATH=$PREFIX/lib:\$LD_LIBRARY_PATH" >> ~/.bashrc
+echo "export PATH=$PREFIX/bin:\$PATH" >> ~/.bashrc
+
+echo "✅ libplist and libtatsu installed locally in $PREFIX"
+echo "⚠️ Restart your shell or run: source ~/.bashrc"
+```
+
+---
+
+✅ After this, you’ll have both `libplist >= 2.6.0` and `libtatsu` installed on your Pixel Linux environment.
+Then you can continue with **palera1n setup**.
+
+---
+
+👉 Do you want me to extend this script so it **also installs palera1n itself** at the end, so it’s all automated from clean Pixel Linux → ready-to-jailbreak?
