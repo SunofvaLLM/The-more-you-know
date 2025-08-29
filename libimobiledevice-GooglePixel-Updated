@@ -1,0 +1,73 @@
+Absolutely—I’ve done the homework and found a solid, ready-to-use solution that will automate building and installing the entire iDevice stack properly on your Pixel Linux (Debian/Ubuntu-based). This will eliminate the guesswork and half-baked steps.
+
+---
+
+## Use a Community-Built Installer Script
+
+There's a **community-maintained installer script** on GitHub called `libimobiledevice-installer` by **nightness**. It automates the fetching, building, and installation of all required components—**libplist, libusbmuxd, libimobiledevice, usbmuxd, idevicerestore, ifuse**, and more—in the correct order. It's exactly the type of comprehensive solution you need.
+([GitHub][1])
+
+### Highlights:
+
+* Handles dependencies and repository setup automatically.
+* Ensures all components are built and installed in the right sequence.
+* Designed for Debian/Ubuntu variants, which matches your Pixel Linux setup.
+* Includes everything from core libraries to handy tools (e.g., ideviceinstaller, ifuse).
+
+You can check the `build-debian.sh` script here:
+([GitHub][2])
+
+---
+
+## How to Use It
+
+Here’s how to get it working on your system:
+
+```bash
+# Install prerequisites
+sudo apt update
+sudo apt install -y git build-essential autoconf automake libtool pkg-config
+
+# Clone the installer repo
+git clone https://github.com/nightness/libimobiledevice-installer.git
+cd libimobiledevice-installer
+
+# Run the Debian automatic builder
+chmod +x build-debian.sh
+./build-debian.sh
+```
+
+This script will:
+
+1. Clone each needed library/tool.
+2. Build them in the correct dependency order.
+3. Install them system-wide via `make install`.
+4. Resolve the version mismatches (like upgrading libplist ≥ 2.6.0) automatically.
+
+---
+
+## Why This Fixes Your Troubles
+
+* **Solves your libplist version issue**: The script automatically fetches a new enough version (≥ 2.6.0) and installs it properly, satisfying requirements for downstream libraries like libtatsu.
+  ([GitHub][3], [Debian Packages][4])
+
+* **Handles libimobiledevice glue and usbmuxd**: Builds and installs the glue and communication libraries before building the main `libimobiledevice`.
+  ([GitHub][5])
+
+* **Runs everything in the correct sequence**, so there are no missing Makefiles or configure failures like you've seen.
+
+---
+
+## Next Steps
+
+1. Give the script a try using the instructions above.
+2. If you encounter any errors during its execution, send me the log/output.
+3. I’ll help troubleshoot specifics—whether that's environment variables, pkg-config paths, or linking issues peculiar to your Pixel Linux setup.
+
+Let me know when it's done or if anything pops up—I’ve got your back!
+
+[1]: https://github.com/nightness/libimobiledevice-installer?utm_source=chatgpt.com "Script to download, build, and install the most recent libplist ..."
+[2]: https://github.com/nightness/libimobiledevice-installer/blob/master/build-debian.sh?utm_source=chatgpt.com "libimobiledevice-installer/build-debian.sh at master · nightness ..."
+[3]: https://github.com/libimobiledevice/idevicerestore/blob/master/configure.ac?utm_source=chatgpt.com "idevicerestore/configure.ac at master - GitHub"
+[4]: https://packages.debian.org/sid/libtatsu-dev?utm_source=chatgpt.com "Debian -- Details of package libtatsu-dev in sid"
+[5]: https://github.com/libimobiledevice/libusbmuxd/blob/master/README.md?utm_source=chatgpt.com "libusbmuxd/README.md at master · libimobiledevice/libusbmuxd"
